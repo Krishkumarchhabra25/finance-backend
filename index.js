@@ -1,0 +1,35 @@
+const dotenv = require("dotenv");
+const express = require("express");
+const cookieParser = require("cookie-parser")
+const connectDB = require("./config/db");
+const authRoutes = require("./routes/UserRoutes")
+const walletAccountRoutes = require("./routes/walletAccountRoute")
+const cardRoutes = require("./routes/CardRoutes")
+const cors = require('cors')
+dotenv.config();
+
+connectDB();
+
+const app = express();
+
+app.use(express.json())
+app.use(cookieParser())
+
+const corsOptions = {
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'],
+  credentials: false
+};
+
+
+app.use(cors(corsOptions));
+
+app.use("/auth" , authRoutes)
+app.use("/wallet" , walletAccountRoutes)
+app.use("/card" , cardRoutes)
+app.listen(
+    process.env.PORT || 5000,
+      console.log(`Server running mode on port ${process.env.PORT || 5000}`)
+
+)
