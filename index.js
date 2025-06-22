@@ -15,16 +15,18 @@ const app = express();
 app.use(express.json())
 app.use(cookieParser())
 
-const corsOptions = {
+/* const corsOptions = {
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-access-token'],
   credentials: false
-};
+}; */
 
 
-app.use(cors(corsOptions));
-
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
 app.use("/auth" , authRoutes)
 app.use("/wallet" , walletAccountRoutes)
 app.use("/card" , cardRoutes)

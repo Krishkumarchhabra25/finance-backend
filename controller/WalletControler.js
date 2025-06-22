@@ -106,7 +106,7 @@ exports.editWalletAccount = async(req,res)=>{
       success: true,
       status: "success",
       message: "Wallet account updated successfully.",
-      wallet: updateWallet,
+      data: updateWallet,
     });
     } catch (error) {
             console.error("Error updating wallet:", error);
