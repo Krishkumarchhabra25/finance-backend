@@ -1,13 +1,4 @@
 const dotenv = require("dotenv");
-
-if (process.env.NODE_ENV !== 'production') {
-  dotenv.config({ path: '.env.development' });
-} else {
-  dotenv.config({ path: '.env.production' });
-}
-
-
-
 const express = require("express");
 const cookieParser = require("cookie-parser")
 const connectDB = require("./config/db");
@@ -32,27 +23,15 @@ app.use(cookieParser())
 }; */
 
 
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? ["https://finance-ai-magement.vercel.app"] // production frontend URL
-  : ["http://localhost:5173"]; // dev frontend
-
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      return callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: "http://localhost:5173",
   credentials: true
 }));
-
-
-
 app.use("/auth" , authRoutes)
 app.use("/wallet" , walletAccountRoutes)
 app.use("/card" , cardRoutes)
+app.listen(
+    process.env.PORT || 5000,
+      console.log(`Server running mode on port ${process.env.PORT || 5000}`)
 
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
+)
