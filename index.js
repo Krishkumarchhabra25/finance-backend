@@ -23,15 +23,29 @@ app.use(cookieParser())
 }; */
 
 
+const allowedOrigins = [
+  "http://localhost:5173",                  // local dev
+  "https://your-frontend-project.vercel.app" // production frontend (change this)
+];
+
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: function (origin, callback) {
+    // allow requests with no origin
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true
 }));
+
+
 app.use("/auth" , authRoutes)
 app.use("/wallet" , walletAccountRoutes)
 app.use("/card" , cardRoutes)
-app.listen(
-    process.env.PORT || 5000,
-      console.log(`Server running mode on port ${process.env.PORT || 5000}`)
 
-)
+app.get('/', (req, res) => {
+  res.send('API is running...');
+});
