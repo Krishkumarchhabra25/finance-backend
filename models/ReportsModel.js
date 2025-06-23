@@ -25,6 +25,7 @@ const ReportConfigSchema = new mongoose.Schema({
     lastGenerated: {
         type: Date
     }
+    
 }, {timestamps: true});
 
 
