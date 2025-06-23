@@ -9,6 +9,11 @@ try {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
+     const validTypes = ['Saving', 'Current', 'Credit', 'Salary', 'NRI', 'PMJDY'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ message: "Invalid account type." });
+    }
+
     const existingWalletAccount = await wallet.findOne({account_number});
     if(existingWalletAccount){
         res.status(409).json({message: "Account number already exist"});

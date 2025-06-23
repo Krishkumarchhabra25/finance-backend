@@ -13,9 +13,8 @@ const AccounSchema = new mongoose.Schema({
   },
   type:{
     type:String,
-    enum:[
-      'Saving' , 'Current' , 'Credit' 
-    ]
+       enum: ['Saving', 'Current', 'Credit', 'Salary', 'NRI', 'PMJDY'],
+    required:true
   },
   balances:{
     type:Number ,

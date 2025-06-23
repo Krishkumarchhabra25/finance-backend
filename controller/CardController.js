@@ -1,9 +1,9 @@
 const Card = require("../models/CardModel");
 const Wallet = require("../models/WalletModel");
 
-exports.createCard = async(req, res)=>{
-    try {
-        const {
+exports.createCard = async (req, res) => {
+  try {
+    const {
       accountId,
       name,
       type,
@@ -16,26 +16,45 @@ exports.createCard = async(req, res)=>{
       currentBalance,
       interestRate,
       isActive
-        } = req.body;
+    } = req.body;
 
-     if (!accountId || !name || !type || !holderName || !cardNumber || !expiryMonth || !expiryYear || !cvv || creditLimit == null) {
+    if (!accountId || !name || !type || !holderName || !cardNumber || !expiryMonth || !expiryYear || !cvv || creditLimit == null) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
-    const accountExists = await Wallet.findOne({_id:accountId , userId: req.user?._id});
-    if(!accountExists){
-        return res.status(400).json({message:"Associated wallet account not found or access denied"})
+    // Find the account (wallet) and validate ownership
+    const accountExists = await Wallet.findOne({ _id: accountId, userId: req.user?._id });
+    if (!accountExists) {
+      return res.status(400).json({ message: "Associated wallet account not found or access denied." });
     }
 
+    // Card type allowed based on account type
+    const allowedCardTypes = {
+      Saving: ['Debit Card', 'ATM Card', 'RuPay Card'],
+      Current: ['Debit Card', 'Credit Card', 'Business Credit Card'],
+      Salary: ['Debit Card', 'Credit Card', 'RuPay Card'],
+      NRI: ['Debit Card', 'Forex Card'],
+      PMJDY: ['Debit Card', 'ATM Card', 'RuPay Card'],
+      Credit: ['Credit Card']
+    };
+
+    const accountType = accountExists.type;
+
+    if (!allowedCardTypes[accountType]?.includes(type)) {
+      return res.status(400).json({
+        message: `Card type '${type}' is not allowed for '${accountType}' account.`,
+      });
+    }
+
+    // Check if card already exists for this account
     const existingCard = await Card.findOne({ accountId, userId: req.user?._id });
     if (existingCard) {
       return res.status(409).json({ message: "A card for this account already exists." });
     }
 
-    
     const lastFourDigits = cardNumber.slice(-4);
 
-    const newCard = await Card({
+    const newCard = new Card({
       userId: req.user?._id,
       accountId,
       name,
@@ -53,12 +72,13 @@ exports.createCard = async(req, res)=>{
     });
 
     const savedCard = await newCard.save();
-     return res.status(201).json({message:"Card created successfully" , data:savedCard})
-    } catch (error) {
-        console.error("Create card error:", error);
+    return res.status(201).json({ message: "Card created successfully", data: savedCard });
+
+  } catch (error) {
+    console.error("Create card error:", error);
     return res.status(500).json({ message: "Failed to create card.", details: error.message });
-    }
-}
+  }
+};
 
 exports.getAllCards = async(req,res)=>{
     try {
@@ -102,13 +122,42 @@ exports.getCardByAccount = async (req, res) => {
 exports.updateCard = async (req, res) => {
   try {
     const allowedFields = [
-      "name", "type", "holderName", "cardNumber", "expiryMonth", "expiryYear",
+      "accountId", "name", "type", "holderName", "cardNumber", "expiryMonth", "expiryYear",
       "cvv", "creditLimit", "currentBalance", "interestRate", "isActive"
     ];
 
     const updates = Object.fromEntries(
       Object.entries(req.body).filter(([key]) => allowedFields.includes(key))
     );
+
+    if (!updates.accountId) {
+      return res.status(400).json({ message: "accountId is required for validation." });
+    }
+
+    // Find the account (wallet)
+    const accountExists = await Wallet.findOne({ _id: updates.accountId, userId: req.user?._id });
+    if (!accountExists) {
+      return res.status(400).json({ message: "Associated wallet account not found or access denied." });
+    }
+
+    // Validate card type against account type if 'type' is being updated
+    if (updates.type) {
+      const allowedCardTypes = {
+        Saving: ['Debit Card', 'ATM Card', 'RuPay Card'],
+        Current: ['Debit Card', 'Credit Card', 'Business Credit Card'],
+        Salary: ['Debit Card', 'Credit Card', 'RuPay Card'],
+        NRI: ['Debit Card', 'Forex Card'],
+        PMJDY: ['Debit Card', 'ATM Card', 'RuPay Card'],
+        Credit: ['Credit Card']
+      };
+
+      const accountType = accountExists.type;
+      if (!allowedCardTypes[accountType]?.includes(updates.type)) {
+        return res.status(400).json({
+          message: `Card type '${updates.type}' is not allowed for '${accountType}' account.`,
+        });
+      }
+    }
 
     if (updates.cardNumber) {
       updates.lastFourDigits = updates.cardNumber.slice(-4);
@@ -120,7 +169,9 @@ exports.updateCard = async (req, res) => {
       { new: true, runValidators: true }
     );
 
-    if (!updatedCard) return res.status(404).json({ message: "Card not found or access denied." });
+    if (!updatedCard) {
+      return res.status(404).json({ message: "Card not found or access denied." });
+    }
 
     return res.status(200).json({ message: "Card updated successfully.", data: updatedCard });
   } catch (error) {
@@ -128,6 +179,7 @@ exports.updateCard = async (req, res) => {
     return res.status(500).json({ message: "Failed to update card.", details: error.message });
   }
 };
+
 
 exports.deleteCard = async (req, res) => {
   try {

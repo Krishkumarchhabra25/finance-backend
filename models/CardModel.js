@@ -16,10 +16,19 @@ const CardSchema = new mongoose.Schema({
         type:String ,
         required: true
     },
-    type:{
-        type:String,
-        enum: ['MASTER CARD' , 'VISA CARD' , 'AMERICAN CARD' , 'DISCOVER']
-    },
+     type: {
+    type: String,
+    enum: [
+      'Debit Card',
+      'Credit Card',
+      'ATM Card',
+      'RuPay Card',
+      'Prepaid Card',
+      'Forex Card',
+      'Business Credit Card'
+    ],
+    required: true,
+  },
     holderName:{
         type:String,
         required:true
