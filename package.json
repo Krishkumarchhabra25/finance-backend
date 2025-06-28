@@ -24,6 +24,8 @@
     "mongoose": "^8.15.2",
     "morgan": "^1.10.0",
     "multer": "^2.0.1",
+    "node-cron": "^4.1.1",
+    "p-limit": "^6.2.0",
     "pug": "^3.0.3"
   },
   "devDependencies": {

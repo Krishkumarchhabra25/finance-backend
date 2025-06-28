@@ -7,6 +7,9 @@ const walletAccountRoutes = require("./routes/walletAccountRoute")
 const cardRoutes = require("./routes/CardRoutes")
 const TransactionRoutes = require("./routes/TransactionRoutes")
 const BillsEmiRoutes = require("./routes/BillsEmiRoutes")
+
+require("./utils/autoPay");
+
 const cors = require('cors')
 dotenv.config();
 
