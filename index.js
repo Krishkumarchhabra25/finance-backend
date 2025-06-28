@@ -6,6 +6,7 @@ const authRoutes = require("./routes/UserRoutes")
 const walletAccountRoutes = require("./routes/walletAccountRoute")
 const cardRoutes = require("./routes/CardRoutes")
 const TransactionRoutes = require("./routes/TransactionRoutes")
+const BillsEmiRoutes = require("./routes/BillsEmiRoutes")
 const cors = require('cors')
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/auth" , authRoutes)
 app.use("/wallet" , walletAccountRoutes)
 app.use("/card" , cardRoutes)
 app.use("/transaction" , TransactionRoutes)
+app.use("/billemi" , BillsEmiRoutes)
 app.listen(
     process.env.PORT || 5000,
       console.log(`Server running mode on port ${process.env.PORT || 5000}`)
