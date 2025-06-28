@@ -12,13 +12,10 @@ exports.createCard = async (req, res) => {
       expiryMonth,
       expiryYear,
       cvv,
-      creditLimit,
-      currentBalance,
-      interestRate,
       isActive
     } = req.body;
 
-    if (!accountId || !name || !type || !holderName || !cardNumber || !expiryMonth || !expiryYear || !cvv || creditLimit == null) {
+    if (!accountId || !name || !type || !holderName || !cardNumber || !expiryMonth || !expiryYear || !cvv) {
       return res.status(400).json({ message: "Missing required fields." });
     }
 
@@ -65,9 +62,6 @@ exports.createCard = async (req, res) => {
       expiryMonth,
       expiryYear,
       cvv,
-      creditLimit,
-      currentBalance: currentBalance ?? 0,
-      interestRate: interestRate ?? 0,
       isActive: isActive ?? true,
     });
 
@@ -123,7 +117,7 @@ exports.updateCard = async (req, res) => {
   try {
     const allowedFields = [
       "accountId", "name", "type", "holderName", "cardNumber", "expiryMonth", "expiryYear",
-      "cvv", "creditLimit", "currentBalance", "interestRate", "isActive"
+      "cvv", "isActive"
     ];
 
     const updates = Object.fromEntries(

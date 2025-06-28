@@ -19,8 +19,7 @@ const AccounSchema = new mongoose.Schema({
   balances:{
     type:Number ,
     required:true,
-    default:0 ,
-    min:0
+    default:0 
   },
   account_number:{
     type: String  ,
